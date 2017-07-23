@@ -85,7 +85,7 @@ function calculate_price(itemList){
 function print_list(itemList,total_price){
     let s="***<没钱赚商店>收据***";
     for(let i=0;i<itemList.length;i++){
-        s+="\n名称:"+itemList[i].name+",数量:"+itemList[i].count+itemList[i].unit+",单价"+itemList[i].price.toFixed(2)+"(元),小计:"+itemList[i].total.toFixed(2)+"(元)";
+        s+="\n名称:"+itemList[i].name+",数量:"+itemList[i].count+itemList[i].unit+",单价:"+itemList[i].price.toFixed(2)+"(元),小计:"+itemList[i].total.toFixed(2)+"(元)";
     }
     s+="\n----------------------";
     s+="\n总计:"+total_price[0].toFixed(2)+"(元)";
