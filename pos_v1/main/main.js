@@ -1,6 +1,6 @@
 'use strict';
 //商品类型
-function item(barcode,name,unit,price,count,promotion){
+function Item(barcode,name,unit,price,count,promotion){
     this.barcode=barcode;
     this.name=name;
     this.unit=unit;
@@ -11,9 +11,9 @@ function item(barcode,name,unit,price,count,promotion){
 
 function load_item_to_itemList(allItem,input){
     let ans=[];
-    let itemMap=[];
-    for(let i=0;i<input.length;i++){
-        let s=input[i].split('-');//处理遇到了barcode-count这种情况的输入
+    let itemMap=new Map();
+    for(let i of input){
+        let s=i.split('-');//处理遇到了barcode-count这种情况的输入
         if(s.length>1){
             var code=s[0];
             var number=Number(s[1]);
@@ -21,17 +21,13 @@ function load_item_to_itemList(allItem,input){
             var code=s[0];
             var number=1;
         }
-        if(typeof(itemMap[code])=="undefined"){
-            itemMap[code]=number;
-        }else{
-            itemMap[code]+=number;
-        }
+        itemMap.set(code,itemMap.has(code)?itemMap.get(code)+number:number);
     }
     //上面都是将输入转化为统一的barcode:count形式，以方便item对象的创建
-    for(let i in itemMap){
-        for(let j=0;j<allItem.length;j++){
-            if(i==allItem[j].barcode){
-                ans.push(new item(allItem[j].barcode,allItem[j].name,allItem[j].unit,allItem[j].price,itemMap[i],{type:"",flag:false}));
+    for (let i of itemMap){
+        for(let j of allItem){
+            if(j.barcode==i[0]){
+                ans.push(new Item(j.barcode,j.name,j.unit,j.price,i[1],null));
             }
         }
     }
@@ -43,7 +39,7 @@ function check_promotions(itemList,promotion){
     for(let i=0;i<promotion.length;i++){
         for(let j=0;j<itemList.length;j++){
             if(promotion[i].barcodes.indexOf(itemList[j].barcode)!=-1){
-                itemList[j].promotion={type:promotion_type_info(promotion[i].type),flag:true};
+                itemList[j].promotion=promotion_type_info(promotion[i].type);
             }
         }
     }
@@ -67,8 +63,8 @@ function calculate_price(itemList){
     for(let i=0;i<itemList.length;i++){
         let ii=itemList[i];
         let cnt=0;
-        if(ii.promotion.flag){
-            let s=ii.promotion.type.split('-');
+        if(ii.promotion){//有优惠
+            let s=ii.promotion.split('-');
             let buy=numbers.indexOf(s[0]);
             let cut=numbers.indexOf(s[1]);
             buy+=cut;
